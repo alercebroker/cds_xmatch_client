@@ -23,6 +23,8 @@ output = client.xmatch(input,catalog_name,radius_arcsec)
   * **Running scrìpt** or directly by means of running a script
     
     ```cds_xmatch --input catalog.csv --catalog allwise --radius 1 --output result.csv```
-    ```cds_xmatch --help
+    
+    ```
+    cds_xmatch --help
     ```
   
