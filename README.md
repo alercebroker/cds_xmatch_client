@@ -10,19 +10,22 @@ This client esentially wraps the CDS Xmatch API to be able to interact with Pand
   
   * **Coding** You can use it in your Python code:
 
-```
-import pandas as pd
-from cds_xmatch_client import Client
+    ```
+    import pandas as pd
+    from cds_xmatch_client import Client
 
-client = Client()
-input  = pd-read_csv( some_input_path )
-catalog_name  = 'allwise'
-radius_arcsec = 1
-output = client.xmatch(input,catalog_name,radius_arcsec)
-```
+    client = Client()
+    input  = pd-read_csv( some_input_path )
+    catalog_name  = 'allwise'
+    radius_arcsec = 1
+    output = client.xmatch(input,catalog_name,radius_arcsec)
+    ```
+    
   * **Running scrìpt** or directly by means of running a script
     
-    ```cds_xmatch --input catalog.csv --catalog allwise --radius 1 --output result.csv```
+    ```
+    cds_xmatch --input catalog.csv --catalog allwise --radius 1 --output result.csv
+    ```
     
     ```
     cds_xmatch --help
