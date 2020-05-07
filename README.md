@@ -6,7 +6,7 @@ This repository contains a simple Python's client to the CDS XMatch API inspired
 
 * **Usage** 
 
-This client esentially wraps the CDS Xmatch API to be able to interact with Pandas DataFrames to handle catalogs.
+This client esentially wraps the CDS Xmatch API to interact with Pandas DataFrames to handle catalogs.
   
   * **Coding** You can use it in your Python code:
 
