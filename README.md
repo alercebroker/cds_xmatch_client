@@ -10,7 +10,7 @@ This client esentially wraps the CDS Xmatch API to interact with Pandas DataFram
   
   * **Coding** You can use it in your Python code:
 
-    ```
+    ```python
     import pandas as pd
     from cds_xmatch_client import Client
 
