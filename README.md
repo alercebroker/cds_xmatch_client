@@ -23,11 +23,11 @@ This client esentially wraps the CDS Xmatch API to interact with Pandas DataFram
     
   * **Running scrìpt** or directly by means of running a script
     
-    ```
+    ```bash
     cds_xmatch --input catalog.csv --catalog allwise --radius 1 --output result.csv
     ```
     
-    ```
+    ```bash
     cds_xmatch --help
     ```
   
