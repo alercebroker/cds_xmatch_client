@@ -2,9 +2,9 @@
 
 This repository contains a simple Python's client to the CDS XMatch API inspired in Fink's Broker implementation: https://github.com/astrolabsoftware/fink-broker developed by Julien Peloton.
 
-* **Installation**  `pip3 install cds_xmatch_client`
+* **Installation:**  `pip3 install cds_xmatch_client`
 
-* **USAGE** This client esentially wraps the CDS Xmatch API to interact with Pandas DataFrames to handle catalogs.
+* **Usage:** This client esentially wraps the CDS Xmatch API to interact with Pandas DataFrames to handle catalogs.
   
   * **Coding** You can use it in your Python code:
 
