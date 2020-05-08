@@ -1,0 +1,30 @@
+import sys
+import argparse
+import pandas as pd
+import traceback
+#from cds_xmatch_client import XmatchClient
+
+parser = argparse.ArgumentParser(description='Request CDS Xmatch API interacting with Pandas DataFrames')
+
+parser.add_argument('--input', metavar='I', type=str, help='Path of input catalog dataframe')
+parser.add_argument('--output', metavar='O', type=str, help='Path of result dataframe')
+parser.add_argument('--catalog', metavar='C', type=str, help='Catalog name: allwise,gaia-dr2,sdss-dr7')
+parser.add_argument('--radious-arcsec', metavar='R', type=float, help='Radius in arcseconds')
+
+args = parser.parse_args()
+
+if __name__ == '__main__':
+
+	client = XmatchClient()
+	try:
+		#read input catalog
+		input_df = pd.read_csv(args.input)
+
+		#execute xmatch
+		result = client.execute(input_df,args.catalog,args.radious-arcsec)
+
+		#write result
+		result.to_csv(args.output)
+	except:
+		sys.stderr.write("Something was wrong:")	
+		sys.stderr.write(traceback.print_exc())
