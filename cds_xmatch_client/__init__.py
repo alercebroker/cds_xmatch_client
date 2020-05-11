@@ -2,6 +2,12 @@ import io
 import pandas as pd
 import requests
 
+CATALOG_MAP = {
+		'allwise' : 'ALLWISE',
+		'gaia-dr2' : 'GAIA DR2',
+		'sdss-dr12' : '',
+}
+
 class XmatchClient:
 
     def __init__(self,url):
@@ -11,6 +17,7 @@ class XmatchClient:
         	        extcatalog: str,
 		            distmaxarcsec: int = 1) -> (list, list):
 
+	extcatalog = CATALOG_MAP[extcatalog]
         subset = df[ ['ra','dec','oid']]
         subset.rename(columns={ 'ra' : 'ra_in', 'dec' : 'dec_in' }, inplace=True)
         s = io.StringIO()
@@ -24,6 +31,7 @@ class XmatchClient:
 		    'distMaxArcsec': distmaxarcsec,
 		    'selection': 'best',
 		    'RESPONSEFORMAT': 'csv',
+		    'typeCat2' : 'Vizier',
 		    'cat2': extcatalog,
 		    'colRA1': 'ra_in',
 		    'colDec1': 'dec_in'},
