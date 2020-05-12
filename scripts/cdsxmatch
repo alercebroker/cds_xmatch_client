@@ -6,27 +6,43 @@ import pandas as pd
 import traceback
 from cds_xmatch_client import XmatchClient
 
-parser = argparse.ArgumentParser(description='Request CDS Xmatch API interacting with Pandas DataFrames')
-
-parser.add_argument('--input', metavar='I', type=str, help='Path of input catalog dataframe')
-parser.add_argument('--output', metavar='O', type=str, help='Path of result dataframe')
-parser.add_argument('--catalog', metavar='C', type=str, help='Catalog name: allwise,gaia-dr2,sdss-dr7')
-parser.add_argument('--radius', metavar='R', type=float, help='Radius in arcseconds')
-
-args = parser.parse_args()
-
 if __name__ == '__main__':
 
+	parser = argparse.ArgumentParser(description='Request CDS Xmatch API interacting with Pandas DataFrames')
+
+	parser.add_argument('--input', metavar='I', type=str, help='Path of input catalog dataframe',required=True)
+	parser.add_argument('--output', metavar='O', type=str, help='Path of result dataframe',required=True)
+	parser.add_argument('--catalog', metavar='C', type=str, help='Catalog name: allwise,gaia-dr2,sdss-dr7',required=True)
+	parser.add_argument('--radius', metavar='R', type=float, help='Radius in arcseconds',required=True)
+
+	args = parser.parse_args()
+
 	client = XmatchClient()
+
+	#read input catalog
 	try:
-		#read input catalog
 		input_df = pd.read_csv(args.input)
+		if 'ra' not in input_df.columns or 'dec' not in input_df.columns:
+			raise Exception("At least columns: ra and dec must be in your input catalog")
+			
 
-		#execute xmatch
+	except Exception as error:
+		sys.stderr.write("Reading input catalog failed:\n")	
+		sys.stderr.write( str(error) + '\n' )
+		sys.exit()
+
+	#execute xmatch
+	try:
 		result = client.execute(input_df,args.catalog,args.radius)
+	except Exception as error:
+		sys.stderr.write("Doing xmatch failed:\n")	
+		sys.stderr.write( str(error) + '\n' )
+		sys.exit()
 
-		#write result
+	#write result
+	try:
 		result.to_csv(args.output,index=False)
-	except:
-		sys.stderr.write("Something was wrong:")	
-		sys.stderr.write(traceback.format_exc())
+	except Exception as error:
+		sys.stderr.write("Writing output result failed:\n")	
+		sys.stderr.write( str(error) + '\n')
+		sys.exit()
