@@ -13,10 +13,10 @@ This repository contains a simple Python's client to the CDS XMatch API inspired
     from cds_xmatch_client import XmatchClient
 
     client = XmatchClient()
-    input  = pd-read_csv( some_input_path )
-    catalog_name  = 'allwise'
+    input  = pd.read_csv( some_input_path )
+    catalog  = 'allwise'
     radius = 1
-    output = client.xmatch(input,catalog_name,radius)
+    output = client.xmatch(input,catalog,radius)
     ```
     
   * **Running scrìpt** Or you can run this script directly:
