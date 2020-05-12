@@ -25,7 +25,7 @@ This repository contains a simple Python's client to the CDS XMatch API inspired
     cds_xmatch --input catalog.csv --catalog allwise --radius 1 --output result.csv
     ```
     
-    ```bash
+    ```
     cds_xmatch --help 
 
 	usage: cdsxmatch [-h] [--input I] [--output O] [--catalog C]
