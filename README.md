@@ -37,7 +37,7 @@ This repository contains a simple Python's client to the CDS XMatch API inspired
 	  -h, --help          show this help message and exit
 	  --input I           Path of input catalog dataframe
 	  --output O          Path of result dataframe
-	  --catalog C         Catalog name: allwise,gaia-dr2,sdss-dr7
+	  --catalog C         Catalog name: allwise,gaia-dr2,sdss-dr12
 	  --radius            R  Radius in arcseconds
     ```
   
