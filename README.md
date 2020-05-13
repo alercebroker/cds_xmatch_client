@@ -16,7 +16,8 @@ This repository contains a simple Python's client to the [CDS XMatch API](http:/
     input  = pd.read_csv( some_input_path )
     catalog  = 'allwise'
     radius = 1
-    output = client.xmatch(input,catalog,radius)
+    selection = 'best'
+    output = client.xmatch(input,catalog,selection,radius)
     ```
     
   * **Running scrìpt** Or you can run this script directly:
