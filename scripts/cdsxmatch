@@ -4,24 +4,29 @@ import sys
 import argparse
 import pandas as pd
 import traceback
+import logging
 from cds_xmatch_client import XmatchClient
 
 if __name__ == '__main__':
+
 
 	parser = argparse.ArgumentParser(description='Request CDS Xmatch API interacting with Pandas DataFrames')
 
 	parser.add_argument('--input', metavar='I', type=str, help='Path of input catalog dataframe',required=True)
 	parser.add_argument('--output', metavar='O', type=str, help='Path of result dataframe',required=True)
-	parser.add_argument('--catalog', metavar='C', type=str, help='Catalog name: allwise,gaia-dr2,sdss-dr7',required=True)
-	parser.add_argument('--radius', metavar='R', type=float, help='Radius in arcseconds',default=1)
+	parser.add_argument('--catalog', metavar='C', type=str, help='Catalog name: an alias or a vizier identifier',required=True)
+	parser.add_argument('--radius', metavar='R', type=float, help='Radius in arcseconds, up to 120',default=1)
 	parser.add_argument('--selection', metavar='S', type=str, help='Select between posible matches: best, all',default='best')
 
 	args = parser.parse_args()
+
+	logging.basicConfig(level=logging.INFO)
 
 	client = XmatchClient()
 
 	#read input catalog
 	try:
+		logging.info("Step1: Reading input dataframe")
 		input_df = pd.read_csv(args.input)
 		if 'ra' not in input_df.columns or 'dec' not in input_df.columns:
 			raise Exception("At least columns: ra and dec must be in your input catalog")
@@ -34,6 +39,7 @@ if __name__ == '__main__':
 
 	#execute xmatch
 	try:
+		logging.info("Step2: Calling CDS Xmatch API")
 		result = client.execute(input_df,args.catalog,args.selection,args.radius)
 	except Exception as error:
 		sys.stderr.write("Doing xmatch failed:\n")	
@@ -42,6 +48,7 @@ if __name__ == '__main__':
 
 	#write result
 	try:
+		logging.info("Step3: Writing result")
 		result.to_csv(args.output,index=False)
 	except Exception as error:
 		sys.stderr.write("Writing output result failed:\n")	
