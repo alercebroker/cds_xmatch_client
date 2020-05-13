@@ -20,7 +20,7 @@ if __name__ == '__main__':
 
 	args = parser.parse_args()
 
-	logging.basicConfig(level=logging.INFO)
+	logging.basicConfig(format='%(asctime)s %(message)s',level=logging.INFO)
 
 	client = XmatchClient()
 
