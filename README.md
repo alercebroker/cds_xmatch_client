@@ -1,6 +1,6 @@
 # CDS Xmatch Client
 
-This repository contains a simple Python's client to the CDS XMatch API inspired in Fink's Broker implementation: https://github.com/astrolabsoftware/fink-broker developed by Julien Peloton.
+This repository contains a simple Python's client to the [CDS XMatch API](http://cdsxmatch.u-strasbg.fr/xmatch/doc/) inspired in [Fink's Broker implementation](https://github.com/astrolabsoftware/fink-broker) developed by Julien Peloton.
 
 * **Installation:**  `pip3 install git+https://github.com/alercebroker/cds_xmatch_client.git`
 
@@ -35,9 +35,11 @@ This repository contains a simple Python's client to the CDS XMatch API inspired
 
 	optional arguments:
 	  -h, --help          show this help message and exit
-	  --input I           Path of input catalog dataframe
-	  --output O          Path of result dataframe
-	  --catalog C         Catalog name: allwise,gaia-dr2,sdss-dr12
-	  --radius            R  Radius in arcseconds
+	  --input I      Path of input catalog dataframe
+  	  --output O     Path of result dataframe
+  	  --catalog C    Catalog name: an alias or a vizier identifier
+  	  --radius R     Radius in arcseconds, up to 120
+  	  --selection S  Select between posible matches: best, all
     ```
+ * **Catalogs** For a complete list of catalogs please search [Vizier's catalogs](https://vizier.u-strasbg.fr/viz-bin/VizieR). For convenience you can also use one of the aliasses defined in [catalog_aliass.json](https://github.com/alercebroker/cds_xmatch_client/blob/master/cds_xmatch_client/data/catalog_alias.json).
   
