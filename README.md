@@ -17,7 +17,7 @@ This repository contains a simple Python's client to the [CDS XMatch API](http:/
     catalog  = 'allwise'
     radius = 1
     selection = 'best'
-    output = client.xmatch(input,catalog,selection,radius)
+    output = client.execute(input,catalog,selection,radius)
     ```
     
   * **Running scrìpt** Or you can run this script directly:
