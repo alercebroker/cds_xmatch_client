@@ -41,5 +41,5 @@ This repository contains a simple Python's client to the [CDS XMatch API](http:/
   	  --radius R     Radius in arcseconds, up to 120
   	  --selection S  Select between posible matches: best, all
     ```
- * **Catalogs** For a complete list of catalogs please search [Vizier's catalogs](https://vizier.u-strasbg.fr/viz-bin/VizieR). For convenience you can also use one of the aliasses defined in [catalog_aliass.json](https://github.com/alercebroker/cds_xmatch_client/blob/master/cds_xmatch_client/data/catalog_alias.json).
+ * **Catalogs** For a complete list of catalogs please search [Vizier's catalogs](https://vizier.u-strasbg.fr/viz-bin/VizieR). For convenience you can also use one of the aliasses defined in [catalog_alias.json](https://github.com/alercebroker/cds_xmatch_client/blob/master/cds_xmatch_client/data/catalog_alias.json).
   
