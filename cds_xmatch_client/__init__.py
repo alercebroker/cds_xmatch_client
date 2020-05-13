@@ -2,24 +2,30 @@ import io
 import sys
 import pandas as pd
 import requests
+import json
+import pkg_resources
 
-CATALOG_MAP = {
-		'allwise' : 'vizier:II/328/allwise',
-		'gaia-dr2' : 'vizier:I/345/gaia2',
-		'sdss-dr12' : 'vizier:V/147/sdss12'
-}
+#catalog alias
+input_path = pkg_resources.resource_filename('cds_xmatch_client','data/catalog_alias.json')
+with open(input_path) as catalogs_file:
+	CATALOG_MAP = json.load(catalogs_file)
 
 class XmatchClient:
 
-	def execute(self,df: pd.core.frame.DataFrame, extcatalog: str, distmaxarcsec: int = 1) -> (pd.core.frame.DataFrame):
+	def execute(self,df: pd.core.frame.DataFrame, extcatalog: str, selection: str, distmaxarcsec: int = 1) -> (pd.core.frame.DataFrame):
 
 		try:
-			extcatalog = CATALOG_MAP[extcatalog]
+			#catalog alias
+			if extcatalog in CATALOG_MAP:
+				extcatalog = CATALOG_MAP[extcatalog]
+
 			# Encode input
-			subset = df[ ['ra','dec','oid']]
-			subset.rename(columns={ 'ra' : 'ra_in', 'dec' : 'dec_in' }, inplace=True)
+			new_columns = {}
+			for c in df.columns:
+				new_columns[c]="%s_in"%(c)
+			df.rename(columns=new_columns, inplace=True)
 			s = io.StringIO()
-			subset.to_csv(s)
+			df.to_csv(s)
 			table_str = s.getvalue()
 
 			# Send the request
@@ -27,7 +33,7 @@ class XmatchClient:
 			data={
 			    'request': 'xmatch',
 			    'distMaxArcsec': distmaxarcsec,
-			    'selection': 'best',
+			    'selection': selection,
 			    'RESPONSEFORMAT': 'csv',
 			    'cat2': extcatalog,
 			    'colRA1': 'ra_in',

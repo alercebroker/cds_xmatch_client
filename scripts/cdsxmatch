@@ -13,7 +13,8 @@ if __name__ == '__main__':
 	parser.add_argument('--input', metavar='I', type=str, help='Path of input catalog dataframe',required=True)
 	parser.add_argument('--output', metavar='O', type=str, help='Path of result dataframe',required=True)
 	parser.add_argument('--catalog', metavar='C', type=str, help='Catalog name: allwise,gaia-dr2,sdss-dr7',required=True)
-	parser.add_argument('--radius', metavar='R', type=float, help='Radius in arcseconds',required=True)
+	parser.add_argument('--radius', metavar='R', type=float, help='Radius in arcseconds',default=1)
+	parser.add_argument('--selection', metavar='S', type=str, help='Select between posible matches: best, all',default='best')
 
 	args = parser.parse_args()
 
@@ -33,7 +34,7 @@ if __name__ == '__main__':
 
 	#execute xmatch
 	try:
-		result = client.execute(input_df,args.catalog,args.radius)
+		result = client.execute(input_df,args.catalog,args.selection,args.radius)
 	except Exception as error:
 		sys.stderr.write("Doing xmatch failed:\n")	
 		sys.stderr.write( str(error) + '\n' )
