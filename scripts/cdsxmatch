@@ -13,12 +13,12 @@ if __name__ == '__main__':
 
 	parser = argparse.ArgumentParser(description='Request CDS Xmatch API interacting with Pandas DataFrames')
 
-	parser.add_argument('--input', metavar='I', type=str, help='Path of input catalog',required=True)
-	parser.add_argument('--input_format', metavar='F', type=str, help='Input catalog format',required=True,default='csv')
-	parser.add_argument('--output', metavar='O', type=str, help='Path of output result',required=True)
-	parser.add_argument('--output_format', metavar='O', type=str, help='Output format',required=True,default='csv')
-	parser.add_argument('--catalog', metavar='C', type=str, help='Catalog name: an alias or a vizier identifier',required=True)
-	parser.add_argument('--catalog_columns', metavar='K', type=str, help='Columns selected from catalog',default='*')
+	parser.add_argument('--input', metavar='PATH', type=str, help='Path of input catalog',required=True)
+	parser.add_argument('--input_format', metavar='FORMAT', type=str, help='Input catalog format',required=True,default='csv')
+	parser.add_argument('--output', metavar='PATH', type=str, help='Path of output result',required=True)
+	parser.add_argument('--output_format', metavar='FORMAT', type=str, help='Output format',required=True,default='csv')
+	parser.add_argument('--catalog', metavar='NAME', type=str, help='Catalog name: an alias or a vizier identifier',required=True)
+	parser.add_argument('--catalog_columns', metavar='COLS', type=str, help='Columns selected from catalog',default='*')
 	parser.add_argument('--radius', metavar='R', type=float, help='Radius in arcseconds, up to 180',default=1)
 	parser.add_argument('--selection', metavar='S', type=str, help='Select between posible matches: best, all',default='best')
 
