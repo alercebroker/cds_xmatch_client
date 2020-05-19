@@ -4,7 +4,7 @@ This repository contains a simple Python's client to the [CDS XMatch API](http:/
 
 * **Installation:**  `pip3 install git+https://github.com/alercebroker/cds_xmatch_client.git`
 
-* **Usage:** This client esentially wraps the CDS Xmatch API to interact with Pandas DataFrames to handle catalogs.
+* **Usage:** This client wraps the CDS Xmatch API to interact with Pandas DataFrames and Astropy VOTables.
   
   * **Coding** You can use it in your Python code:
 
@@ -18,9 +18,9 @@ This repository contains a simple Python's client to the [CDS XMatch API](http:/
     #PARAMS
     
     catalog_alias  = 'gaia-dr2'
-    columns  	   = [ 'pmra', 'pmrdec' ]
-    radius 	   = 2
-    selection      = 'best'
+    columns  = [ 'pmra', 'pmrdec' ]
+    radius  = 2
+    selection  = 'best'
     
     #INPUT: Pandas DataFrame / OUTPUT: Astropy VOTable
     
