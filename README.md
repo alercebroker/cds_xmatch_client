@@ -16,7 +16,8 @@ This repository contains a simple Python's client to the [CDS XMatch API](http:/
     input  = pd.read_csv( some_input_path )
     catalog  = 'allwise'
     radius = 1
-    output = client.xmatch(input,catalog,radius)
+    selection = 'best'
+    output = client.execute(input,catalog,selection,radius)
     ```
     
   * **Running scrìpt** Or you can run this script directly:
@@ -38,8 +39,10 @@ This repository contains a simple Python's client to the [CDS XMatch API](http:/
 	  --input I      Path of input catalog dataframe
   	  --output O     Path of result dataframe
   	  --catalog C    Catalog name: an alias or a vizier identifier
-  	  --radius R     Radius in arcseconds, up to 120
+  	  --radius R     Radius in arcseconds, up to 180
   	  --selection S  Select between posible matches: best, all
     ```
  * **Catalogs** For a complete list of catalogs please search [Vizier's catalogs](https://vizier.u-strasbg.fr/viz-bin/VizieR). For convenience you can also use one of the aliases defined in [catalog_alias.json](https://github.com/alercebroker/cds_xmatch_client/blob/master/cds_xmatch_client/data/catalog_alias.json).
+ 
+ * **Limitations** According to [CDS Xmatch API limitations](http://cdsxmatch.u-strasbg.fr/xmatch/doc/API-limitations.html)
   
