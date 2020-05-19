@@ -2,8 +2,9 @@
 
 import sys
 import argparse
+from astropy.table import Table
+import astropy.io.votable as votable
 import pandas as pd
-import traceback
 import logging
 from cds_xmatch_client import XmatchClient
 
@@ -12,11 +13,15 @@ if __name__ == '__main__':
 
 	parser = argparse.ArgumentParser(description='Request CDS Xmatch API interacting with Pandas DataFrames')
 
-	parser.add_argument('--input', metavar='I', type=str, help='Path of input catalog dataframe',required=True)
-	parser.add_argument('--output', metavar='O', type=str, help='Path of result dataframe',required=True)
+	parser.add_argument('--input', metavar='I', type=str, help='Path of input catalog',required=True)
+	parser.add_argument('--input_format', metavar='F', type=str, help='Input catalog format',required=True,default='csv')
+	parser.add_argument('--output', metavar='O', type=str, help='Path of output result',required=True)
+	parser.add_argument('--output_format', metavar='O', type=str, help='Output format',required=True,default='csv')
 	parser.add_argument('--catalog', metavar='C', type=str, help='Catalog name: an alias or a vizier identifier',required=True)
-	parser.add_argument('--radius', metavar='R', type=float, help='Radius in arcseconds, up to 120',default=1)
+	parser.add_argument('--catalog_columns', metavar='K', type=str, help='Columns selected from catalog',default='*')
+	parser.add_argument('--radius', metavar='R', type=float, help='Radius in arcseconds, up to 180',default=1)
 	parser.add_argument('--selection', metavar='S', type=str, help='Select between posible matches: best, all',default='best')
+
 
 	args = parser.parse_args()
 
@@ -27,12 +32,36 @@ if __name__ == '__main__':
 	#read input catalog
 	try:
 		logging.info("Step1: Reading input dataframe")
-		input_df = pd.read_csv(args.input)
-		if 'ra' not in input_df.columns or 'dec' not in input_df.columns:
-			raise Exception("At least columns: ra and dec must be in your input catalog")
+
+		table_type = None
+		#CSV -> Pandas DataFrame
+		if args.input_format == 'csv':
+			input_table  = pd.read_csv(args.input)
+			table_type = 'pandas'
 			
+		#VOTable -> Astropy Table
+		elif args.input_format == 'votable':
+			input_table = Table.read(args.input,format='votable')
+			table_type = 'astropy'
+	
+		#Anything else
+		else:
+			raise Exception("Input format %s not recognized"%(args.input_format) )
+
+		# verify ra and dec are present
+		if 'ra' not in input_table.columns or 'dec' not in input_table.columns:
+			raise Exception("At least columns: ra and dec must be in your input catalog")
+
+		#external catalog columns
+		if args.catalog_columns == '*':
+			catalog_columns = None
+		else:
+			catalog_columns = args.catalog_columns.split(',')
+
+
 
 	except Exception as error:
+
 		sys.stderr.write("Reading input catalog failed:\n")	
 		sys.stderr.write( str(error) + '\n' )
 		sys.exit()
@@ -40,7 +69,25 @@ if __name__ == '__main__':
 	#execute xmatch
 	try:
 		logging.info("Step2: Calling CDS Xmatch API")
-		result = client.execute(input_df,args.catalog,args.selection,args.radius)
+
+		output_type = None
+		if args.output_format == 'csv':
+			output_type = 'pandas'
+		elif args.output_format == 'votable':
+			output_type = 'astropy'
+		else:
+			raise Exception("Output format %s not recognized"%(args.output_format))
+
+		result = client.execute(
+					input_table,
+					table_type,
+					args.catalog,
+					catalog_columns,
+					args.selection,
+					output_type,
+					args.radius
+		)
+
 	except Exception as error:
 		sys.stderr.write("Doing xmatch failed:\n")	
 		sys.stderr.write( str(error) + '\n' )
@@ -49,7 +96,17 @@ if __name__ == '__main__':
 	#write result
 	try:
 		logging.info("Step3: Writing result")
-		result.to_csv(args.output,index=False)
+
+		#CSV
+		if args.output_format == 'csv':
+			result.to_csv(args.output,index=False)
+
+		#VOTable
+		elif args.output_format == 'votable':
+			result = votable.from_table(result)
+			result.to_xml(args.output)
+
+
 	except Exception as error:
 		sys.stderr.write("Writing output result failed:\n")	
 		sys.stderr.write( str(error) + '\n')
