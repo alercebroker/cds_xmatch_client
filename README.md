@@ -9,22 +9,55 @@ This repository contains a simple Python's client to the [CDS XMatch API](http:/
   * **Coding** You can use it in your Python code:
 
     ```python
-    import pandas as pd
+    
+    #CLIENT
+    
     from cds_xmatch_client import XmatchClient
-
     client = XmatchClient()
-    input  = pd.read_csv( some_input_path )
-    catalog  = 'allwise'
-    radius = 1
-    selection = 'best'
-    output = client.execute(input,catalog,selection,radius)
+    
+    #PARAMS
+    
+    catalog_alias  = 'gaia-dr2'
+    columns  	   = [ 'pmra', 'pmrdec' ]
+    radius 	   = 2
+    selection      = 'best'
+    
+    #INPUT: Pandas DataFrame / OUTPUT: Astropy VOTable
+    
+    import pandas as pd
+    input_path = 'catalog.csv'
+    input_type = 'pandas'
+    df   = pd.read_csv(input_path)
+    output_type = 'astropy'
+    output = client.execute( 
+    				df,
+				input_type,
+				catalog_alias,
+				columns,
+				selection,
+				output_type,
+				radius
+    )
+    
+    #INPUT: Astropy VOTable / OUTPUT: Pandas DataFrame
+    
+    from astropy.table import Table
+    input_path = 'catalog.xml'
+    input_type = 'astropy'
+    table = Table.read(input_path)
+    output_type = 'pandas'
+    output = client.execute(
+    				table,
+				input_type,
+				catalog_alias,
+				columns,
+				selection,
+				output_type,
+				radius
+    )
     ```
     
   * **Running scrìpt** Or you can run this script directly:
-    
-    ```bash
-    cds_xmatch --input catalog.csv --catalog allwise --radius 1 --output result.csv
-    ```
     
     ```
    	usage: cdsxmatch [-h] --input PATH --input_format FORMAT --output PATH
