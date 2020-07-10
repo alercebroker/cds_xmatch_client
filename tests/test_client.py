@@ -83,6 +83,34 @@ class ClientTest(unittest.TestCase):
                 output_type,
                 self.radius
                 )
+    def test_wrong_input_type(self):
+        input_type = 'wrong'
+        output_type = 'astropy'
+        with self.assertRaises(Exception):
+            self.client.execute(
+                self.test_astropy_data,
+                input_type,
+                self.name,
+                self.columns,
+                self.selection,
+                output_type,
+                self.radius
+                )
+
+    def test_wrong_output_type(self):
+        input_type = 'astropy'
+        output_type = 'wrong'
+        with self.assertRaises(Exception):
+            self.client.execute(
+                self.test_astropy_data,
+                input_type,
+                self.name,
+                self.columns,
+                self.selection,
+                output_type,
+                self.radius
+                )
+
 
 
     def tearDown(self):
