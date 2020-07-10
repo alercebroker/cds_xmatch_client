@@ -1,18 +1,28 @@
 import unittest
 import pandas as pd
 import os
+import io
 from unittest import mock
 from astropy.table import Table
+from astropy.io.votable import from_table
 from cds_xmatch_client import XmatchClient
 
 class MockResponse:
-    def __init__(self,content):
-        self.content = content
+    def __init__(self,content_path, format="pandas"):
+        if format == "pandas":
+            with open(content_path) as f:
+                expected_result = str.encode(f.read())
+
+        else:
+            t = Table.read(content_path,format="csv")
+            votable = from_table(t)
+            f = io.BytesIO()
+            votable.to_xml(f)
+            f.seek(0)
+            expected_result = f.read()
+        self.content = expected_result
 
 FILE_PATH = os.path.dirname(__file__)
-with open(os.path.join(FILE_PATH,"examples/res.txt")) as f:
-    expected_result = str.encode(f.read())
-    expected_response = MockResponse(content=expected_result)
 
 
 class ClientTest(unittest.TestCase):
@@ -45,7 +55,7 @@ class ClientTest(unittest.TestCase):
         self.test_pandas_data = pd.read_csv(os.path.join(FILE_PATH,"examples/test.csv"))
         self.test_astropy_data = Table.read(os.path.join(FILE_PATH,"examples/test.votable"), format="votable")
 
-    @mock.patch('cds_xmatch_client.requests.post', return_value=expected_response)
+    @mock.patch('cds_xmatch_client.requests.post', return_value= MockResponse(content_path=os.path.join(FILE_PATH,"examples/res.txt"), format="pandas"))
     def test_execute_pandas(self, requests_mock):
         input_type = 'pandas'
         output_type = 'pandas'
@@ -60,20 +70,19 @@ class ClientTest(unittest.TestCase):
                 )
         self.assertIsInstance(output, pd.DataFrame)
 
-    # @mock.patch('cds_xmatch_client.requests.post', return_value=expected_response)
-    # def test_execute_astropy(self, requests_mock):
-    #     input_type = 'astropy'
-    #     output_type = 'astropy'
-    #     output = self.client.execute(
-    #             self.test_astropy_data,
-    #             input_type,
-    #             self.name,
-    #             self.columns,
-    #             self.selection,
-    #             output_type,
-    #             self.radius
-    #             )
-    #     output.to_csv("res.txt",index=False)
+    @mock.patch('cds_xmatch_client.requests.post', return_value= MockResponse(content_path=os.path.join(FILE_PATH,"examples/res.txt"), format="votable"))
+    def test_execute_astropy(self, requests_mock):
+        input_type = 'astropy'
+        output_type = 'astropy'
+        output = self.client.execute(
+                self.test_astropy_data,
+                input_type,
+                self.name,
+                self.columns,
+                self.selection,
+                output_type,
+                self.radius
+                )
 
 
     def tearDown(self):
