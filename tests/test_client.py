@@ -9,7 +9,7 @@ from cds_xmatch_client import XmatchClient
 
 
 class MockResponse:
-    def __init__(self, content_path, format="pandas"):
+    def __init__(self, content_path, format="pandas", ok=True):
         if format == "pandas":
             with open(content_path) as f:
                 expected_result = str.encode(f.read())
@@ -22,6 +22,7 @@ class MockResponse:
             f.seek(0)
             expected_result = f.read()
         self.content = expected_result
+        self.ok = ok
 
 
 FILE_PATH = os.path.dirname(__file__)
