@@ -1,0 +1,17 @@
+language: python
+python:
+- '3.6'
+- '3.7'
+env:
+  global:
+    secure: aT9DMwLq4r/HUGsSXk7XJBw89wqVI+2F1vto9iQTwfAQIWsvZ6haIs2lMKDOVkLWuNYGNGxt1jp/u5EP20ZQ35J37OJLLekRkc22HyOWEuz2p5NpKD8oex93b9zESbgLj8uJThgzagCg3tDBUzp86VDEVu6cwFLJAdkbwY0ZsghAl8ykg/qshArDWVjKc9tExhaBl7QGMxnij+2OXcOXZ+/RNXAI28o5UFTjEI0tkYJ3fcyTkzGWscntzcM5QaiJAnuVUB0weTeKSNI+mhrtaFfi2LBfSQHy8gveOzQk1gQ5rdnOe3PqnnaikMtX+o+tiyXQNm7I2CtD9ysFS5sABqGS4MsQv8QA4A4nUxVFNDVbkP145Ir6W3Oh0RaNJPL2JrBwc76PWHbOPLnm1O4uCBAbBl6or0Jq0LAKDBpVvGAXCyajeNNpjoIGcCW1QAuZ9K/QlPVTQBVqxOh8ESud87xW74SmAwmGsMwziJbB65DHvoQkT2U5jI2LeHtorsjDpqt43ViWXMVvSthTDezV9HF6P08wwxWeg+nttIsQ5gvKLnfponIAo7ug2qER/TPLjzNV1076TDgbef8CXcIpuVZNcul511CruYUk/ikbl1vZTNLHXUHRTpG5YppTC4EknQLdG7O2Mxs7wreizRhk5Bd6zazxhoxNBGrKw/nc77g=
+install:
+- pip install coverage
+- pip install codecov
+- pip install -U pytest
+- pip install -U pytest-cov
+- pip install -r requirements.txt
+script:
+- coverage run --source cds_xmatch_client -m pytest
+after_success:
+- codecov
