@@ -9,105 +9,115 @@ import logging
 from cds_xmatch_client import XmatchClient
 
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser(
+        description='Request CDS Xmatch API interacting with Pandas DataFrames')
 
+    parser.add_argument(
+        '--input', metavar='PATH', type=str,
+        help='Path of input catalog', required=True)
+    parser.add_argument(
+        '--input_format', metavar='FORMAT', type=str,
+        help='Input catalog format', required=True, default='csv')
+    parser.add_argument(
+        '--output', metavar='PATH', type=str,
+        help='Path of output result', required=True)
+    parser.add_argument(
+        '--output_format', metavar='FORMAT', type=str,
+        help='Output format', required=True, default='csv')
+    parser.add_argument(
+        '--catalog', metavar='NAME', type=str,
+        help='Catalog name: an alias or a vizier identifier', required=True)
+    parser.add_argument(
+        '--catalog_columns', metavar='COLS', type=str,
+        help='Columns selected from catalog', default='*')
+    parser.add_argument(
+        '--radius', metavar='R', type=float,
+        help='Radius in arcseconds, up to 180', default=1)
+    parser.add_argument(
+        '--selection', metavar='S', type=str,
+        help='Select between possible matches: best, all', default='best')
 
-	parser = argparse.ArgumentParser(description='Request CDS Xmatch API interacting with Pandas DataFrames')
+    args = parser.parse_args()
+    logging.basicConfig(format='%(asctime)s %(message)s', level=logging.INFO)
 
-	parser.add_argument('--input', metavar='PATH', type=str, help='Path of input catalog',required=True)
-	parser.add_argument('--input_format', metavar='FORMAT', type=str, help='Input catalog format',required=True,default='csv')
-	parser.add_argument('--output', metavar='PATH', type=str, help='Path of output result',required=True)
-	parser.add_argument('--output_format', metavar='FORMAT', type=str, help='Output format',required=True,default='csv')
-	parser.add_argument('--catalog', metavar='NAME', type=str, help='Catalog name: an alias or a vizier identifier',required=True)
-	parser.add_argument('--catalog_columns', metavar='COLS', type=str, help='Columns selected from catalog',default='*')
-	parser.add_argument('--radius', metavar='R', type=float, help='Radius in arcseconds, up to 180',default=1)
-	parser.add_argument('--selection', metavar='S', type=str, help='Select between posible matches: best, all',default='best')
+    client = XmatchClient()
 
+    # read input catalog
+    try:
+        logging.info("Step1: Reading input dataframe")
 
-	args = parser.parse_args()
+        table_type = None
+        # CSV -> Pandas DataFrame
+        if args.input_format == 'csv':
+            input_table = pd.read_csv(args.input)
+            table_type = 'pandas'
 
-	logging.basicConfig(format='%(asctime)s %(message)s',level=logging.INFO)
+        # VOTable -> Astropy Table
+        elif args.input_format == 'votable':
+            input_table = Table.read(args.input, format='votable')
+            table_type = 'astropy'
 
-	client = XmatchClient()
+        # Anything else
+        else:
+            raise Exception("Input format %s not recognized" % args.input_format)
 
-	#read input catalog
-	try:
-		logging.info("Step1: Reading input dataframe")
+        # verify ra and dec are present
+        if 'ra' not in input_table.columns or 'dec' not in input_table.columns:
+            raise Exception("At least columns: ra and dec must be in your input catalog")
 
-		table_type = None
-		#CSV -> Pandas DataFrame
-		if args.input_format == 'csv':
-			input_table  = pd.read_csv(args.input)
-			table_type = 'pandas'
-			
-		#VOTable -> Astropy Table
-		elif args.input_format == 'votable':
-			input_table = Table.read(args.input,format='votable')
-			table_type = 'astropy'
-	
-		#Anything else
-		else:
-			raise Exception("Input format %s not recognized"%(args.input_format) )
+        # external catalog columns
+        if args.catalog_columns == '*':
+            catalog_columns = None
+        else:
+            catalog_columns = args.catalog_columns.split(',')
 
-		# verify ra and dec are present
-		if 'ra' not in input_table.columns or 'dec' not in input_table.columns:
-			raise Exception("At least columns: ra and dec must be in your input catalog")
+    except Exception as error:
 
-		#external catalog columns
-		if args.catalog_columns == '*':
-			catalog_columns = None
-		else:
-			catalog_columns = args.catalog_columns.split(',')
+        sys.stderr.write("Reading input catalog failed:\n")
+        sys.stderr.write(str(error) + '\n')
+        sys.exit()
 
+    # execute xmatch
+    try:
+        logging.info("Step2: Calling CDS Xmatch API")
 
+        output_type = None
+        if args.output_format == 'csv':
+            output_type = 'pandas'
+        elif args.output_format == 'votable':
+            output_type = 'astropy'
+        else:
+            raise Exception("Output format %s not recognized" % args.output_format)
 
-	except Exception as error:
+        result = client.execute(
+            input_table,
+            table_type,
+            args.catalog,
+            catalog_columns,
+            args.selection,
+            output_type,
+            args.radius
+        )
 
-		sys.stderr.write("Reading input catalog failed:\n")	
-		sys.stderr.write( str(error) + '\n' )
-		sys.exit()
+    except Exception as error:
+        sys.stderr.write("Doing xmatch failed:\n")
+        sys.stderr.write(str(error) + '\n')
+        sys.exit()
 
-	#execute xmatch
-	try:
-		logging.info("Step2: Calling CDS Xmatch API")
+    # write result
+    try:
+        logging.info("Step3: Writing result")
 
-		output_type = None
-		if args.output_format == 'csv':
-			output_type = 'pandas'
-		elif args.output_format == 'votable':
-			output_type = 'astropy'
-		else:
-			raise Exception("Output format %s not recognized"%(args.output_format))
+        # CSV
+        if args.output_format == 'csv':
+            result.to_csv(args.output, index=False)
 
-		result = client.execute(
-					input_table,
-					table_type,
-					args.catalog,
-					catalog_columns,
-					args.selection,
-					output_type,
-					args.radius
-		)
+        # VOTable
+        elif args.output_format == 'votable':
+            result = votable.from_table(result)
+            result.to_xml(args.output)
 
-	except Exception as error:
-		sys.stderr.write("Doing xmatch failed:\n")	
-		sys.stderr.write( str(error) + '\n' )
-		sys.exit()
-
-	#write result
-	try:
-		logging.info("Step3: Writing result")
-
-		#CSV
-		if args.output_format == 'csv':
-			result.to_csv(args.output,index=False)
-
-		#VOTable
-		elif args.output_format == 'votable':
-			result = votable.from_table(result)
-			result.to_xml(args.output)
-
-
-	except Exception as error:
-		sys.stderr.write("Writing output result failed:\n")	
-		sys.stderr.write( str(error) + '\n')
-		sys.exit()
+    except Exception as error:
+        sys.stderr.write("Writing output result failed:\n")
+        sys.stderr.write(str(error) + '\n')
+        sys.exit()

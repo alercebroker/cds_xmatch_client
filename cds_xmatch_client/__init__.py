@@ -16,15 +16,15 @@ with open(input_path) as catalogs_file:
 
 
 class XmatchClient:
+    @staticmethod
     def execute(
-        self,
-        catalog,
-        catalog_type: str,
-        ext_catalog: str,
-        ext_columns: list,
-        selection: str,
-        result_type: str,
-        distmaxarcsec: int = 1,
+            catalog,
+            catalog_type: str,
+            ext_catalog: str,
+            ext_columns: list,
+            selection: str,
+            result_type: str,
+            distmaxarcsec: int = 1,
     ):
 
         try:
@@ -33,13 +33,12 @@ class XmatchClient:
                 ext_catalog = CATALOG_MAP[ext_catalog]
 
             # Encode input
-            catalog_content = None
             if catalog_type == "pandas":
 
                 string_io = io.StringIO()
                 new_columns = {}
                 for c in catalog.columns:
-                    new_columns[c] = "%s_in" % (c)
+                    new_columns[c] = "%s_in" % c
                 catalog.rename(columns=new_columns, inplace=True)
 
                 catalog.to_csv(string_io)
@@ -49,7 +48,7 @@ class XmatchClient:
 
                 columns = list(catalog.columns)
                 for c in columns:
-                    catalog.rename_column(c, "%s_in" % (c))
+                    catalog.rename_column(c, "%s_in" % c)
 
                 bytes_io = io.BytesIO()
                 catalog = votable.from_table(catalog)
@@ -57,21 +56,20 @@ class XmatchClient:
                 catalog_content = bytes_io.getvalue()
 
             else:
-                raise Exception("Unknow input type %s" % (catalog_type))
+                raise Exception("Unknown input type %s" % catalog_type)
 
             # columns
             ext_columns_str = None
-            if not ext_columns is None:
+            if ext_columns is not None:
                 ext_columns_str = ",".join(ext_columns)
 
             # response format
-            response_format = None
             if result_type == "pandas":
                 response_format = "csv"
             elif result_type == "astropy":
                 response_format = "votable"
             else:
-                raise Exception("Unknow output type %s" % (result_type))
+                raise Exception("Unknown output type %s" % result_type)
 
             # params
             params = {
@@ -106,7 +104,7 @@ class XmatchClient:
 
         except Exception as exception:
 
-            sys.stderr.write("Request to CDS xmatch failed: %s \n" % (exception))
+            sys.stderr.write("Request to CDS xmatch failed: %s \n" % exception)
             raise exception
 
         return result
